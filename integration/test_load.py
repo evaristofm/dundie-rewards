@@ -2,7 +2,7 @@ import pytest
 from subprocess import check_output
 
 
-@pytest.mark.unit
+@pytest.mark.integration
 def test_load():
     """test command load"""
     out = check_output(
