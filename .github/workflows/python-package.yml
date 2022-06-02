@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: CI
 
 on:
   push:
@@ -9,35 +9,35 @@ on:
   pull_request:
     branches: [ main ]
 
+    workflow_dispatch:
+
 jobs:
   lint:
-      runs-on: ubuntu-latest
-      strategy:
-        fail-fast: true
-        matrix:
-          python-version: ["3.10"]
-
-      steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ['3.10']
+        os: [ubuntu-latest]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install project
-        run: |
-          python -m pip install '.[test]'  
-    
-      - name: Look for style erros
+          python-version: ${{matrix.python-version}}
+      - name: Install Project
+        run: pip install '.[test]'
+      # - name: Typing
+      #   run: mypy --ignore-missing-imports dundie
+      - name: Look for style errors
         run: pflake8
       - name: Check for importing style
-        run: isort --profile=black --check --diff dundie tests integration
-      - name: Look for auto format erros
+        run: isort --profile=black -m 3 --check --diff dundie tests integration
+      - name: Look for auto format errors
         run: black --check --diff dundie tests integration
-
 
 jobs:
   build:
-
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
